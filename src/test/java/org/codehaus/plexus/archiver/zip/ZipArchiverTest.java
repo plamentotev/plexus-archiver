@@ -595,6 +595,29 @@ public class ZipArchiverTest
         assertEquals( l2, l3 );
     }
 
+    public void testUpdateArchive()
+            throws Exception
+    {
+        File f = getTestFile( "target/output/archive-update.zip" );
+        if ( f.exists() )
+        {
+            FileUtils.fileDelete( f.getPath() );
+        }
+
+        ZipArchiver archiver = getZipArchiver( f );
+        archiver.addFile( getTestFile( "src/test/resources/manifests/manifest1.mf" ), "file.txt" );
+        archiver.createArchive();
+
+        ZipArchiver updateArchiver = getZipArchiver( f );
+        updateArchiver.setUpdateMode( true );
+        archiver.addFile( getTestFile( "src/test/resources/manifests/manifest2.mf" ), "newfile.txt" );
+        archiver.createArchive();
+
+        ZipFile zf = new ZipFile( f );
+        assertNotNull( zf.getEntry( "file.txt" ) );
+        assertNotNull( zf.getEntry( "newfile.txt" ) );
+    }
+
     // Used to investigate extrafields
     public void testLookAtExtraZipFields_from_macos()
         throws IOException
